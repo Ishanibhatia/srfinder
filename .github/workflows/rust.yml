@@ -1,4 +1,4 @@
-name: Rust
+name: Rust CI
 
 on:
   push:
@@ -11,12 +11,30 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y pkg-config
+
+    - name: Build backend
+      run: cargo build --release --verbose
+
     - name: Run tests
       run: cargo test --verbose
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: Deployment Complete
+      run: echo "Build and test completed successfully. Deployment step can be added here."
